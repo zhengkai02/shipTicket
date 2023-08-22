@@ -166,7 +166,7 @@ func (p *Ship) shipList(ctx *builder.Context) interface{} {
 		"perPage":     perPage,
 		"total":       total,
 		"items":       result,
-		//"items": []interface{}{map[string]interface{}{"id": "zzzzzz", "LineName": "yyyyy", "ShipName": "xxxxxxxxx"}},
+		//"items": []api{}{map[string]api{}{"id": "zzzzzz", "LineName": "yyyyy", "ShipName": "xxxxxxxxx"}},
 	}
 }
 

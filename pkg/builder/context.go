@@ -580,7 +580,7 @@ func (p *Context) IsImport() bool {
 	return (uri[len(uri)-1] == "import")
 }
 
-// 输出成功状态的JSON数据，JSONOk("成功") | JSONOk("成功", map[string]interface{}{"title":"标题"})
+// 输出成功状态的JSON数据，JSONOk("成功") | JSONOk("成功", map[string]api{}{"title":"标题"})
 func (p *Context) JSONOk(message ...interface{}) error {
 	var (
 		content = ""

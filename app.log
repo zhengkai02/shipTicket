@@ -11,3 +11,5 @@
 {"time":"2023-08-11T13:24:57.2891641+08:00","id":"","remote_ip":"127.0.0.1","host":"127.0.0.1:3000","method":"GET","uri":"/api/admin/ship/index?api=%2Fapi%2Fadmin%2Fship%2Findex&filter=%7B%7D&search=%7B%22current%22%3A1%2C%22pageSize%22%3A10%7D&sorter=%7B%7D","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36","status":200,"error":"","latency":105561900,"latency_human":"105.5619ms","bytes_in":0,"bytes_out":0}
 ⇨ http server started on [::]:3000
 ⇨ http server started on [::]:3000
+{"time":"2023-08-22T13:22:39.6759604+08:00","level":"FATAL","prefix":"echo","file":"engine.go","line":"646","message":"listen tcp :3000: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted."}
+⇨ http server started on [::]:3000

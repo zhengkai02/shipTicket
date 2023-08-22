@@ -195,7 +195,7 @@ func (p *Component) fieldParser(v interface{}, when bool) []interface{} {
 	vKind := reflect.
 		ValueOf(v).
 		Kind()
-	if vKind.String() != "interface" {
+	if vKind.String() != "api" {
 		return items
 	}
 

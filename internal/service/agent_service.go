@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/DamnWidget/goqueue"
 	"github.com/labstack/gommon/log"
+	"github.com/quarkcms/quark-go/v2/internal/data"
 	"github.com/quarkcms/quark-go/v2/pkg/app/admin/model"
 	"gorm.io/gorm"
 	"time"
@@ -17,12 +19,14 @@ import (
 **/
 
 type AgentService struct {
-	db *gorm.DB
+	db    *gorm.DB
+	queue *goqueue.Queue
 }
 
 func NewAgentService(db *gorm.DB) *AgentService {
 	return &AgentService{
-		db: db,
+		db:    db,
+		queue: data.NewGlobalQueue(),
 	}
 }
 
@@ -33,21 +37,22 @@ func (a AgentService) Start(ctx context.Context) error {
 		}
 		var ret []*model.Task
 		err := a.db.
-			Debug().
 			Model(&model.Task{}).
 			Find(&ret, cond).
 			Error
 		if err != nil {
-			panic(err)
+			log.Errorf("数据查询失败，err=[%v]", err)
 		}
 		for _, task := range ret {
-			fmt.Println(task.UserID, task.Passengers)
+			fmt.Println(task.UserID, task.DepaturePortName, task.ArrvalPortName)
 			log.Infof("任务[%v]放入队列", task.ID)
+			if err := a.queue.Push(task); err != nil {
+				log.Errorf("任务加入队列失败,err=[%v]", err)
+				continue
+			}
 		}
 		time.Sleep(5 * time.Second)
 	}
-
-	return nil
 }
 
 func (a AgentService) Stop(ctx context.Context) error {

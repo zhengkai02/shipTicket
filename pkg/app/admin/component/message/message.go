@@ -19,7 +19,7 @@ func New() *Component {
 	return (&Component{}).Init()
 }
 
-// 返回成功，Success("成功") | Success("成功", "/home/index", map[string]interface{}{"title":"标题"})
+// 返回成功，Success("成功") | Success("成功", "/home/index", map[string]api{}{"title":"标题"})
 func Success(message ...interface{}) *Component {
 	var (
 		content = ""

@@ -3,6 +3,7 @@ module github.com/quarkcms/quark-go/v2
 go 1.18
 
 require (
+	github.com/DamnWidget/goqueue v0.0.0-20141017152100-f1771bfb094a
 	github.com/alibabacloud-go/darabonba-openapi v0.2.1
 	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.18
 	github.com/alibabacloud-go/tea v1.2.1
@@ -18,12 +19,14 @@ require (
 	github.com/gobeam/stringy v0.0.6
 	github.com/gofiber/fiber/v2 v2.47.0
 	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/google/uuid v1.3.0
 	github.com/labstack/gommon v0.4.0
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/wangluozhe/requests v1.1.15
 	github.com/xuri/excelize/v2 v2.7.1
 	golang.org/x/crypto v0.11.0
+	golang.org/x/sync v0.3.0
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.2
 )
@@ -53,7 +56,6 @@ require (
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/google/pprof v0.0.0-20230705174524-200ffdc848b8 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
@@ -95,7 +97,6 @@ require (
 	go.opentelemetry.io/otel/trace v1.16.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.20.0 // indirect
 	go.uber.org/automaxprocs v1.5.2 // indirect
-	golang.org/x/sync v0.3.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/genproto v0.0.0-20230711160842-782d3b101e98 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20230711160842-782d3b101e98 // indirect

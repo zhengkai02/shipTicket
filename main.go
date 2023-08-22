@@ -67,11 +67,11 @@ func main() {
 	// 开启Debug模式
 	b.Echo().Debug = true
 
-	// 日志文件位置
-	//f, _ := os.OpenFile("./app.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
+	//日志文件位置
+	f, _ := os.OpenFile("./app.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
 
 	// 记录日志
-	b.Echo().Logger.SetOutput(io.MultiWriter(os.Stdout))
+	b.Echo().Logger.SetOutput(io.MultiWriter(f, os.Stdout))
 
 	// 日志中间件
 	//b.Echo().Use(echomiddleware.Logger())
@@ -93,7 +93,9 @@ func main() {
 			ws,
 		),
 	)
-	app.Run()
+	if err := app.Run(); err != nil {
+		panic(err)
+	}
 
 	// 启动服务
 	b.Run(":3000")

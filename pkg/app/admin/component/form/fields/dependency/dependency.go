@@ -366,14 +366,14 @@ func (p *Component) SetIgnore(ignore bool) *Component {
 
 // 设置When组件数据
 //
-//	SetWhen("name",1, func () interface{} {
-//		return []interface{}{
+//	SetWhen("name",1, func () api{} {
+//		return []api{}{
 //	       field.Text("name", "姓名"),
 //	   }
 //	})
 //
-//	SetWhen("name",">", 1, func () interface{} {
-//		return []interface{}{
+//	SetWhen("name",">", 1, func () api{} {
+//		return []api{}{
 //	       field.Text("name", "姓名"),
 //	   }
 //	})

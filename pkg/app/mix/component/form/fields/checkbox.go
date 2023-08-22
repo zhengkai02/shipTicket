@@ -47,8 +47,8 @@ func (p *Checkbox) SetColor(color string) *Checkbox {
 	return p
 }
 
-// 设置单选属性，[]map[string]interface{}{{"text": "Title1","value": "value1"},{"text": "Title2","value": "value2"}}
-// 或者 map[interface{}]interface{}{"value1":"Title1","value2":"Title2"}
+// 设置单选属性，[]map[string]api{}{{"text": "Title1","value": "value1"},{"text": "Title2","value": "value2"}}
+// 或者 map[api{}]api{}{"value1":"Title1","value2":"Title2"}
 func (p *Checkbox) SetOptions(options interface{}) *Checkbox {
 	var data []map[string]interface{}
 

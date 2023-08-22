@@ -26,14 +26,17 @@ type AgentService interface {
 
 // NewWatchServer 新建后台监听服务
 func NewWatchServer(db *gorm.DB) *WatchServer {
-	cs := &WatchServer{}
+	ws := &WatchServer{}
 	// kafka消费者服务
 	agentService := service.NewAgentService(db)
-	cs.RegisterService(agentService)
+	ws.RegisterService(agentService)
 
 	//rs := service.NewRedisService(pricingRule)
 	//cs.RegisterService(rs)
-	return cs
+
+	cs := service.NewConsumerService()
+	ws.RegisterService(cs)
+	return ws
 }
 
 func (s *WatchServer) RegisterService(as AgentService) {
