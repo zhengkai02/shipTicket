@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"github.com/DamnWidget/goqueue"
 	"github.com/labstack/gommon/log"
 	"github.com/quarkcms/quark-go/v2/internal/data"
@@ -44,8 +43,7 @@ func (a AgentService) Start(ctx context.Context) error {
 			log.Errorf("数据查询失败，err=[%v]", err)
 		}
 		for _, task := range ret {
-			fmt.Println(task.UserID, task.DepaturePortName, task.ArrvalPortName)
-			log.Infof("任务[%v]放入队列", task.ID)
+			log.Debugf("任务[%v]放入队列", task.ID)
 			if err := a.queue.Push(task); err != nil {
 				log.Errorf("任务加入队列失败,err=[%v]", err)
 				continue

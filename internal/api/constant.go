@@ -8,7 +8,7 @@ package api
 **/
 
 const (
-	LoginURL      = "https://www.ssky123.com/api/v2/user/passLogin?phoneNum=13669904989&passwd=Perr78!!&deviceType=1"
+	LoginURL      = "https://www.ssky123.com/api/v2/user/passLogin"
 	UserInfoURL   = "https://www.ssky123.com/api/v2/user/userInfo"
 	EnqURL        = "https://www.ssky123.com/api/v2/line/ship/enq"
 	FerryEnqURL   = "https://www.ssky123.com/api/v2/line/ferry/enq"

@@ -35,7 +35,7 @@ func (s *ConsumerService) Start(ctx context.Context) error {
 			time.Sleep(100 * time.Millisecond)
 			continue
 		}
-		log.Infof("消费者收到任务消息: %v", item)
+		log.Debugf("消费者收到任务消息: %v", item)
 		task, ok := item.(*model.Task)
 		if !ok {
 			log.Errorf("消息格式错误：mgs=[%v]", task)
@@ -47,7 +47,7 @@ func (s *ConsumerService) Start(ctx context.Context) error {
 				log.Errorf("任务处理失败，err=[%v]", err.Error())
 				return
 			}
-			log.Infof("任务处理成功,耗时=[%v]", time.Since(task.CreateTime))
+			log.Debugf("任务处理成功,耗时=[%v]", time.Since(task.CreateTime))
 		}(task)
 
 	}
@@ -58,31 +58,52 @@ func (s *ConsumerService) Stop(ctx context.Context) error {
 }
 
 func process(t *model.Task) error {
-	log.Infof("处理任务：[%v-%v-%v]", t.DepaturePortName, t.ArrvalPortName, t.EarliestTime)
+	log.Infof("处理任务：[%v-%v-%v %v-%v]", t.DepaturePortName, t.ArrvalPortName, t.DepartureDate.Format(time.DateOnly), t.EarliestTime, t.LastestTime)
 	// 查询航班
 	ticketList, err := api.ShipTicketList(t.DepaturePortCode, t.ArrivalPortCode, t.DepartureDate.Format(time.DateOnly))
 	if err != nil {
 		log.Errorf("航班查询失败，err=[%v]", err)
 		return err
 	}
-	// 摆渡车
-	if t.VehicleNum > 0 {
-
-	}
-	// 根据时间区间过滤航班
-	for _, ticket := range ticketList {
-		// 时间筛选
-		sailTime, _ := time.Parse("15:04", ticket.SailTime)
-		earliestTime, _ := time.Parse("15:04:05", t.EarliestTime)
-		latestTime, _ := time.Parse("15:04:05", t.LastestTime)
-		if sailTime.Before(earliestTime) || sailTime.After(latestTime) {
-			continue
+	switch true {
+	case t.VehicleNum > 0:
+		// 摆渡车
+		ferryTicketList, err := api.FerryTicketList(t.DepaturePortCode, t.ArrivalPortCode, t.DepartureDate.Format(time.DateOnly))
+		if err != nil {
+			log.Errorf("查询客车票失败，err=[%v]", err)
 		}
-		for _, cls := range ticket.SeatClasses {
-			if cls.PubCurrentCount >= t.PassengerNum {
-				msg := fmt.Sprintf("检测到余票【%s-%s-%s %s %v ￥%v】【%v】张", ticket.StartPortName, ticket.EndPortName, ticket.SailDate, ticket.SailTime, cls.ClassName, cls.TotalPrice, cls.PubCurrentCount)
-				api.SendMsg("trip", msg)
-				log.Info(msg)
+		for _, ticket := range ferryTicketList {
+			// 时间筛选
+			sailTime, _ := time.Parse("15:04", ticket.SailTime)
+			earliestTime, _ := time.Parse("15:04:05", t.EarliestTime)
+			latestTime, _ := time.Parse("15:04:05", t.LastestTime)
+			if sailTime.Before(earliestTime) || sailTime.After(latestTime) {
+				continue
+			}
+			for _, cls := range ticket.DriverSeatClass {
+				if cls.PubCurrentCount >= t.VehicleNum {
+					msg := fmt.Sprintf("检测到摆渡车余票【%s-%s-%s %s %v ￥%v】【%v】张", ticket.StartPortName, ticket.EndPortName, ticket.SailDate, ticket.SailTime, cls.ClassName, cls.TotalPrice, cls.PubCurrentCount)
+					api.SendMsg("trip", msg)
+					log.Warnf(msg)
+				}
+			}
+		}
+	case t.VehicleNum == 0:
+		// 根据时间区间过滤航班
+		for _, ticket := range ticketList {
+			// 时间筛选
+			sailTime, _ := time.Parse("15:04", ticket.SailTime)
+			earliestTime, _ := time.Parse("15:04:05", t.EarliestTime)
+			latestTime, _ := time.Parse("15:04:05", t.LastestTime)
+			if sailTime.Before(earliestTime) || sailTime.After(latestTime) {
+				continue
+			}
+			for _, cls := range ticket.SeatClasses {
+				if cls.PubCurrentCount >= t.PassengerNum {
+					msg := fmt.Sprintf("检测到旅客余票【%s-%s-%s %s %v ￥%v】【%v】张", ticket.StartPortName, ticket.EndPortName, ticket.SailDate, ticket.SailTime, cls.ClassName, cls.TotalPrice, cls.PubCurrentCount)
+					api.SendMsg("trip", msg)
+					log.Info(msg)
+				}
 			}
 		}
 	}
