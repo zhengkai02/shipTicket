@@ -160,7 +160,7 @@ type SeatClasses struct {
 	ClassNum            int         `json:"classNum"`
 	ClassName           string      `json:"className"`
 	LocalCurrentCount   int         `json:"localCurrentCount"`
-	PubCurrentCount     int         `json:"pubCurrentCount"`
+	PubCurrentCount     int64       `json:"pubCurrentCount"`
 	TotalCount          int         `json:"totalCount"`
 	FerryPassTotalCount interface{} `json:"ferryPassTotalCount"`
 	OriginPrice         float64     `json:"originPrice"`
@@ -183,7 +183,7 @@ type DriverClass struct {
 	ClassNum            int         `json:"classNum"`
 	ClassName           string      `json:"className"`
 	LocalCurrentCount   int         `json:"localCurrentCount"`
-	PubCurrentCount     int         `json:"pubCurrentCount"`
+	PubCurrentCount     int64       `json:"pubCurrentCount"`
 	TotalCount          int         `json:"totalCount"`
 	FerryPassTotalCount int         `json:"ferryPassTotalCount"`
 	OriginPrice         float64     `json:"originPrice"`
@@ -267,8 +267,8 @@ type PassengersResp struct {
 }
 
 type Passenger struct {
-	Id               int         `json:"id"`
-	UserId           int         `json:"userId"`
+	Id               int64       `json:"id"`
+	UserId           int64       `json:"userId"`
 	PassName         string      `json:"passName"`
 	CredentialTypeId int         `json:"credentialTypeId"`
 	CredentialNum    string      `json:"credentialNum"`

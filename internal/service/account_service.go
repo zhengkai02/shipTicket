@@ -6,6 +6,7 @@ import (
 	"github.com/quarkcms/quark-go/v2/internal/api"
 	"github.com/quarkcms/quark-go/v2/pkg/app/admin/model"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"time"
 )
 
@@ -70,5 +71,29 @@ func (s *AccountService) keepSession(account *model.Account) {
 			Updates(values).Error; err != nil {
 			log.Errorf("数据更新失败,err=[%v]", err)
 		}
+	}
+	passengers, err := api.PassengerList(account.UserID, account.Token)
+	if err != nil {
+		log.Errorf("拉取乘客信息失败，err=[%v]", err)
+		return
+	}
+	var ps []*model.Passenger
+	for _, v := range passengers {
+		p := &model.Passenger{
+			Name:       v.PassName,
+			IdCard:     v.CredentialNum,
+			CarNo:      "",
+			UserId:     v.Id,
+			CreateTime: time.Now(),
+		}
+		ps = append(ps, p)
+	}
+	err = s.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "id_card"}},
+		DoUpdates: clause.AssignmentColumns([]string{"update_time"}),
+	}).CreateInBatches(ps, len(ps)).Error
+	if err != nil {
+		log.Errorf("乘客信息添加失败，err=[%v]", err)
+		return
 	}
 }

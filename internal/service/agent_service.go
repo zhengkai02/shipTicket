@@ -43,7 +43,7 @@ func (a AgentService) Start(ctx context.Context) error {
 			log.Errorf("数据查询失败，err=[%v]", err)
 		}
 		for _, task := range ret {
-			log.Debugf("任务[%v]放入队列", task.ID)
+			log.Debugf("任务[%v]放入队列", task.Id)
 			if err := a.queue.Push(task); err != nil {
 				log.Errorf("任务加入队列失败,err=[%v]", err)
 				continue

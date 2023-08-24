@@ -16,7 +16,7 @@ type Line struct {
 // 初始化
 func (p *Line) Init(ctx *builder.Context) interface{} {
 	// 标题
-	p.Title = "港口"
+	p.Title = "航线"
 	// 模型
 	p.Model = &model.Line{}
 	// 分页

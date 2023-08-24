@@ -31,23 +31,27 @@ func (p *Task) Init(ctx *builder.Context) interface{} {
 
 func (p *Task) Fields(ctx *builder.Context) []interface{} {
 	field := &resource.Field{}
-	options, _ := (&model.User{}).Options()
+	users, _ := (&model.User{}).Options()
+	ports, _ := (&model.Port{}).Options()
+	portNames, _ := (&model.Port{}).Options1()
 
 	return []interface{}{
 		field.ID("id", "ID"),
-		field.Text("depature_port_name", "出发港").SetRequired(),
-		field.Text("arrval_port_name", "到达港").SetRequired(),
+		field.Select("departure_port_code", "出发港").SetRequired().HideFromIndex(true).SetOptions(ports),
+		field.Select("departure_port_name", "出发港").SetOptions(portNames),
+		field.Select("arrival_port_code", "到达港").SetRequired().HideFromIndex(true).SetOptions(ports),
+		field.Select("arrival_port_name", "到达港").SetOptions(portNames),
 		field.Date("departure_date", "出发日期").SetRequired(),
 		field.Time("earliest_time", "最早出发时间"),
 		field.Time("lastest_time", "最晚出发时间"),
-		field.Text("passenger_num", "乘客数").SetRequired(),
-		field.Text("vehicle_num", "车辆数").SetRequired(),
+		field.Number("passenger_num", "乘客数").SetRequired(),
+		field.Number("vehicle_num", "车辆数").SetRequired(),
 		// 单选模式
-		field.Select("user_id", "用户").SetOptions(options),
+		field.Select("user_id", "联系人").SetOptions(users),
 
 		//field.Editor("content", "内容").OnlyOnForms(),
-		field.Datetime("create_time", "创建时间"),
-		field.Datetime("update_time", "更新时间"),
+		field.Datetime("create_time", "创建时间").HideWhenCreating(true),
+		field.Datetime("update_time", "更新时间").HideWhenCreating(true),
 
 		field.Switch("status", "状态").
 			SetTrueValue("启动").

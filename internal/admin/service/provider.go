@@ -11,4 +11,5 @@ var Provider = []interface{}{
 	&resource.Account{},
 	&resource.Task{},
 	&resource.User{},
+	&resource.Passenger{},
 }

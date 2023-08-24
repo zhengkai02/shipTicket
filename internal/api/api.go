@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/andybalholm/brotli"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -142,15 +140,34 @@ func Login(account, password string) (*LoginResp, error) {
 	return loginResp, nil
 }
 
-// brotli 解压缩
-func uncompressed(compressedTxt string) ([]byte, error) {
-	b := strings.NewReader(compressedTxt)
-	r := brotli.NewReader(b)
-	data, err := io.ReadAll(r)
+// 乘客信息列表
+func PassengerList(userId int64, token string) ([]*Passenger, error) {
+	var (
+		client = http.DefaultClient
+	)
+	req, err := http.NewRequest(http.MethodGet, PassengersURL, nil)
 	if err != nil {
 		return nil, err
 	}
-	return data, nil
+	for k, v := range generateHeader() {
+		req.Header.Set(k, v)
+	}
+	req.Header.Set("token", token)
+	req.Header.Set("authentication", fmt.Sprintf("%v%v", time.Now().Unix(), userId))
+	res, err := client.Do(req)
+	defer res.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	resBytes, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	var ps *PassengersResp
+	if err := json.Unmarshal(resBytes, &ps); err != nil {
+		return nil, err
+	}
+	return ps.Data, nil
 }
 
 func generateHeader() map[string]string {

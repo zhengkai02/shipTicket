@@ -62,9 +62,9 @@ func (s *ConsumerService) Stop(ctx context.Context) error {
 }
 
 func (s *ConsumerService) process(t *model.Task) error {
-	log.Infof("处理任务：[%v-%v-%v %v-%v]", t.DepaturePortName, t.ArrvalPortName, t.DepartureDate.Format(time.DateOnly), t.EarliestTime, t.LastestTime)
+	log.Infof("处理任务：[%v-%v-%v %v-%v]", t.DeparturePortName, t.ArrivalPortName, t.DepartureDate.Format(time.DateOnly), t.EarliestTime, t.LastestTime)
 	// 查询航班
-	ticketList, err := api.ShipTicketList(t.DepaturePortCode, t.ArrivalPortCode, t.DepartureDate.Format(time.DateOnly))
+	ticketList, err := api.ShipTicketList(t.DeparturePortCode, t.ArrivalPortCode, t.DepartureDate.Format(time.DateOnly))
 	if err != nil {
 		log.Errorf("航班查询失败，err=[%v]", err)
 		return err
@@ -72,7 +72,7 @@ func (s *ConsumerService) process(t *model.Task) error {
 	switch true {
 	case t.VehicleNum > 0:
 		// 摆渡车
-		ferryTicketList, err := api.FerryTicketList(t.DepaturePortCode, t.ArrivalPortCode, t.DepartureDate.Format(time.DateOnly))
+		ferryTicketList, err := api.FerryTicketList(t.DeparturePortCode, t.ArrivalPortCode, t.DepartureDate.Format(time.DateOnly))
 		if err != nil {
 			log.Errorf("查询客车票失败，err=[%v]", err)
 		}
@@ -104,7 +104,7 @@ func (s *ConsumerService) process(t *model.Task) error {
 			}
 			for _, cls := range ticket.SeatClasses {
 				if cls.PubCurrentCount >= t.PassengerNum {
-					orderId := fmt.Sprintf("B%v%v%v%v", t.DepaturePortCode, t.ArrivalPortCode, t.DepartureDate.Format("20060102"), t.UserID)
+					orderId := fmt.Sprintf("B%v%v%v%v", t.DeparturePortCode, t.ArrivalPortCode, t.DepartureDate.Format("20060102"), t.UserId)
 
 					var count int64
 					cond := map[string]string{

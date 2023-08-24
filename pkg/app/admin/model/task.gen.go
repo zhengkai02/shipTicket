@@ -12,20 +12,20 @@ const TableNameTask = "t_task"
 
 // Task mapped from table <t_task>
 type Task struct {
-	ID               int64     `gorm:"column:id;type:bigint(64);primaryKey;autoIncrement:true" json:"id"`
-	DepaturePortCode int64     `gorm:"column:depature_port_code;type:int(8);not null" json:"depature_port_code"`
-	DepaturePortName string    `gorm:"column:depature_port_name;type:varchar(255);not null" json:"depature_port_name"`
-	ArrivalPortCode  int64     `gorm:"column:arrival_port_code;type:int(8);not null" json:"arrival_port_code"`
-	ArrvalPortName   string    `gorm:"column:arrval_port_name;type:varchar(64);not null" json:"arrval_port_name"`
-	DepartureDate    time.Time `gorm:"column:departure_date;type:date" json:"departure_date"`
-	EarliestTime     string    `gorm:"column:earliest_time;type:time;not null;default:07:00:00" json:"earliest_time"`
-	LastestTime      string    `gorm:"column:lastest_time;type:time;not null;default:21:00:00" json:"lastest_time"`
-	UserID           int64     `gorm:"column:user_id;type:int(8);not null" json:"user_id"`
-	PassengerNum     int       `gorm:"column:passenger_num;type:int(8)" json:"passenger_num"`
-	VehicleNum       int       `gorm:"column:vehicle_num;type:int(8)" json:"vehicle_num"`
-	Status           bool      `gorm:"column:status;type:tinyint(1);not null" json:"status"`
-	CreateTime       time.Time `gorm:"column:create_time;type:datetime;not null" json:"create_time"`
-	UpdateTime       time.Time `gorm:"column:update_time;type:datetime;not null;default:CURRENT_TIMESTAMP" json:"update_time"`
+	Id                int64     `gorm:"column:id;type:bigint(64);primaryKey;autoIncrement:true" json:"id"`
+	DeparturePortCode int64     `gorm:"column:departure_port_code;type:int(8);not null" json:"departure_port_code"`
+	DeparturePortName string    `gorm:"column:departure_port_name;type:varchar(255);not null" json:"departure_port_name"`
+	ArrivalPortCode   int64     `gorm:"column:arrival_port_code;type:int(8);not null" json:"arrival_port_code"`
+	ArrivalPortName   string    `gorm:"column:arrival_port_name;type:varchar(64);not null" json:"arrival_port_name"`
+	DepartureDate     time.Time `gorm:"column:departure_date;type:date" json:"departure_date"`
+	EarliestTime      string `gorm:"column:earliest_time;type:time;not null;default:07:00:00" json:"earliest_time"`
+	LastestTime       string `gorm:"column:lastest_time;type:time;not null;default:21:00:00" json:"lastest_time"`
+	UserId            int64     `gorm:"column:user_id;type:int(8);not null" json:"user_id"`
+	PassengerNum      int64     `gorm:"column:passenger_num;type:int(8)" json:"passenger_num"`
+	VehicleNum        int64     `gorm:"column:vehicle_num;type:int(8)" json:"vehicle_num"`
+	Status            int32     `gorm:"column:status;type:tinyint(4);not null" json:"status"`
+	CreateTime        time.Time `gorm:"column:create_time;type:datetime;not null" json:"create_time"`
+	UpdateTime        time.Time `gorm:"column:update_time;type:datetime;not null;default:CURRENT_TIMESTAMP" json:"update_time"`
 }
 
 // TableName Task's table name

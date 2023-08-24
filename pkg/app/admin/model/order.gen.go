@@ -18,8 +18,8 @@ type Order struct {
 	DeparturePortName string    `gorm:"column:departure_port_name;type:varchar(32);not null" json:"departure_port_name"`
 	ArrivalPortName   string    `gorm:"column:arrival_port_name;type:varchar(32);not null" json:"arrival_port_name"`
 	DepartureTime     time.Time `gorm:"column:departure_time;type:datetime" json:"departure_time"`
-	PassengerNum      int       `gorm:"column:passenger_num;type:int(8)" json:"passenger_num"`
-	VehicleNum        int       `gorm:"column:vehicle_num;type:int(8)" json:"vehicle_num"`
+	PassengerNum      int64       `gorm:"column:passenger_num;type:int(8)" json:"passenger_num"`
+	VehicleNum        int64       `gorm:"column:vehicle_num;type:int(8)" json:"vehicle_num"`
 	CreateTime        time.Time `gorm:"column:create_time;type:datetime;not null;default:2023-01-01 00:00:00" json:"create_time"`
 	UpdateTime        time.Time `gorm:"column:update_time;type:datetime;not null;default:CURRENT_TIMESTAMP" json:"update_time"`
 }

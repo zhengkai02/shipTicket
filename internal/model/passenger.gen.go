@@ -14,11 +14,12 @@ const TableNamePassenger = "t_passenger"
 type Passenger struct {
 	Id         int64     `gorm:"column:id;type:int(8);primaryKey;autoIncrement:true" json:"id"`
 	Name       string    `gorm:"column:name;type:varchar(255);not null" json:"name"`
-	IdCard     string    `gorm:"column:id_card;type:varchar(255);not null" json:"id_card"`
+	IDCard     string    `gorm:"column:id_card;type:varchar(255);not null" json:"id_card"`
 	CarNo      string    `gorm:"column:car_no;type:varchar(255);not null" json:"car_no"`
 	UserId     int64     `gorm:"column:user_id;type:int(8)" json:"user_id"`
 	CreateTime time.Time `gorm:"column:create_time;type:datetime;not null;default:2023-07-24 00:00:00" json:"create_time"`
 	UpdateTime time.Time `gorm:"column:update_time;type:datetime;not null;default:2023-07-24 00:00:00" json:"update_time"`
+	Status     int32     `gorm:"column:status;type:tinyint(4);not null" json:"status"`
 }
 
 // TableName Passenger's table name

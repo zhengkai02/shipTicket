@@ -39,8 +39,28 @@ func (p *Port) Options() (options []*selectfield.Option, Error error) {
 
 	for _, v := range getList {
 		option := &selectfield.Option{
-			Label: fmt.Sprintf("%s-%s", v.Code, v.Name),
+			Label: fmt.Sprintf("%s", v.Name),
 			Value: v.Code,
+		}
+		options = append(options, option)
+	}
+
+	return options, nil
+}
+
+
+// 获取列表
+func (p *Port) Options1() (options []*selectfield.Option, Error error) {
+	getList := []Port{}
+	err := db.Client.Find(&getList).Error
+	if err != nil {
+		return options, err
+	}
+
+	for _, v := range getList {
+		option := &selectfield.Option{
+			Label: fmt.Sprintf("%s", v.Name),
+			Value: v.Name,
 		}
 		options = append(options, option)
 	}
