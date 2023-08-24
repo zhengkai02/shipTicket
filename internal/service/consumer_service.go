@@ -8,6 +8,8 @@ import (
 	"github.com/quarkcms/quark-go/v2/internal/api"
 	"github.com/quarkcms/quark-go/v2/internal/data"
 	"github.com/quarkcms/quark-go/v2/pkg/app/admin/model"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"time"
 )
 
@@ -20,11 +22,13 @@ import (
 
 type ConsumerService struct {
 	queue *goqueue.Queue
+	db    *gorm.DB
 }
 
-func NewConsumerService() *ConsumerService {
+func NewConsumerService(db *gorm.DB) *ConsumerService {
 	return &ConsumerService{
 		queue: data.NewGlobalQueue(),
+		db:    db,
 	}
 }
 
@@ -41,14 +45,14 @@ func (s *ConsumerService) Start(ctx context.Context) error {
 			log.Errorf("消息格式错误：mgs=[%v]", task)
 			continue
 		}
-		go func(t *model.Task) {
+		go func(s *ConsumerService, t *model.Task) {
 			task.CreateTime = time.Now()
-			if err := process(task); err != nil {
+			if err := s.process(task); err != nil {
 				log.Errorf("任务处理失败，err=[%v]", err.Error())
 				return
 			}
 			log.Debugf("任务处理成功,耗时=[%v]", time.Since(task.CreateTime))
-		}(task)
+		}(s, task)
 
 	}
 }
@@ -57,7 +61,7 @@ func (s *ConsumerService) Stop(ctx context.Context) error {
 	return nil
 }
 
-func process(t *model.Task) error {
+func (s *ConsumerService) process(t *model.Task) error {
 	log.Infof("处理任务：[%v-%v-%v %v-%v]", t.DepaturePortName, t.ArrvalPortName, t.DepartureDate.Format(time.DateOnly), t.EarliestTime, t.LastestTime)
 	// 查询航班
 	ticketList, err := api.ShipTicketList(t.DepaturePortCode, t.ArrivalPortCode, t.DepartureDate.Format(time.DateOnly))
@@ -100,6 +104,39 @@ func process(t *model.Task) error {
 			}
 			for _, cls := range ticket.SeatClasses {
 				if cls.PubCurrentCount >= t.PassengerNum {
+					orderId := fmt.Sprintf("B%v%v%v%v", t.DepaturePortCode, t.ArrivalPortCode, t.DepartureDate.Format("20060102"), t.UserID)
+
+					var count int64
+					cond := map[string]string{
+						"order_id": orderId,
+					}
+					err := s.db.Model(&model.Order{}).Where(cond).Count(&count).Error
+					if count > 0 {
+						break
+					}
+					departureTimeStr := ticket.SailDate + ticket.SailTime
+					departureTime, _ := time.ParseInLocation("2006/01/0215:04", departureTimeStr, time.Local)
+					order := &model.Order{
+						ID:                0,
+						OrderID:           orderId,
+						SuplierOrderID:    "",
+						DeparturePortName: ticket.StartPortName,
+						ArrivalPortName:   ticket.EndPortName,
+						DepartureTime:     departureTime,
+						PassengerNum:      t.PassengerNum,
+						VehicleNum:        t.VehicleNum,
+						CreateTime:        time.Now(),
+						UpdateTime:        time.Now(),
+					}
+					// 不处理冲突
+					err = s.db.Clauses(clause.OnConflict{DoNothing: true}).Create(order).Error
+					if err != nil {
+						return err
+					}
+					//s.db.Clauses(clause.OnConflict{
+					//	Columns:   []clause.Column{{Name: "id"}},
+					//	DoUpdates: clause.AssignmentColumns([]string{"name", "age"}),
+					//}).Create(order)
 					msg := fmt.Sprintf("检测到旅客余票【%s-%s-%s %s %v ￥%v】【%v】张", ticket.StartPortName, ticket.EndPortName, ticket.SailDate, ticket.SailTime, cls.ClassName, cls.TotalPrice, cls.PubCurrentCount)
 					api.SendMsg("trip", msg)
 					log.Info(msg)
@@ -107,6 +144,5 @@ func process(t *model.Task) error {
 			}
 		}
 	}
-
 	return nil
 }

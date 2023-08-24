@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 )
 
 /**
@@ -84,7 +85,7 @@ func FerryTicketList(start, end int64, date string) ([]*TicketData, error) {
 }
 
 // 检查登录状态
-func CheckToken(token string) error {
+func CheckToken(userId int64, token string) error {
 	req, err := http.NewRequest(http.MethodGet, CheckTokenURL, nil)
 	if err != nil {
 		return err
@@ -92,6 +93,8 @@ func CheckToken(token string) error {
 	for k, v := range generateHeader() {
 		req.Header.Set(k, v)
 	}
+	authentication := fmt.Sprintf("%v%v", time.Now().Unix(), userId)
+	req.Header.Set("authentication", authentication)
 	req.Header.Set("token", token)
 	client := http.DefaultClient
 	res, err := client.Do(req)

@@ -52,7 +52,7 @@ func (s *AccountService) Stop(ctx context.Context) error {
 }
 
 func (s *AccountService) keepSession(account *model.Account) {
-	if err := api.CheckToken(account.Token); err != nil {
+	if err := api.CheckToken(account.UserID, account.Token); err != nil {
 		resp, err := api.Login(account.Account, account.Password)
 		if err != nil {
 			log.Errorf("登录失败，err=[%v]", err)
@@ -66,7 +66,7 @@ func (s *AccountService) keepSession(account *model.Account) {
 		if err := s.db.
 			Debug().
 			Model(&model.Account{}).
-			Where("account = ?", account.Account).
+			Where("id = ?", account.ID).
 			Updates(values).Error; err != nil {
 			log.Errorf("数据更新失败,err=[%v]", err)
 		}

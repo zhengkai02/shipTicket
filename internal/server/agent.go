@@ -34,8 +34,11 @@ func NewWatchServer(db *gorm.DB) *WatchServer {
 	//rs := service.NewRedisService(pricingRule)
 	//cs.RegisterService(rs)
 
-	cs := service.NewConsumerService()
+	cs := service.NewConsumerService(db)
 	ws.RegisterService(cs)
+
+	as := service.NewAccountService(db)
+	ws.RegisterService(as)
 	return ws
 }
 

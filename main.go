@@ -72,9 +72,8 @@ func main() {
 
 	// 记录日志
 	b.Echo().Logger.SetOutput(io.MultiWriter(f, os.Stdout))
-
 	// 日志中间件
-	//b.Echo().Use(echomiddleware.Logger())
+	b.Echo().Use(echomiddleware.Logger())
 
 	// 崩溃后自动恢复
 	b.Echo().Use(echomiddleware.Recover())
