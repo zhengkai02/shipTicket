@@ -28,7 +28,6 @@ func (*User) TableName() string {
 	return TableNameUser
 }
 
-
 // 获取列表
 func (p *User) Options() (options []*selectfield.Option, Error error) {
 	getList := []User{}
@@ -44,6 +43,9 @@ func (p *User) Options() (options []*selectfield.Option, Error error) {
 		}
 		options = append(options, option)
 	}
-
+	options = append(options, &selectfield.Option{
+		Label: "空",
+		Value: "",
+	})
 	return options, nil
 }

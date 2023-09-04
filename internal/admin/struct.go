@@ -207,3 +207,9 @@ type OrderDetailResp struct {
 		WgroupReplacePercent interface{} `json:"wgroupReplacePercent"`
 	} `json:"data"`
 }
+
+type TicketFilter struct {
+	ClassName string `json:"class_name"`
+	Interval  string `json:"interval"`
+	Clxm      string `json:"clxm"`
+}

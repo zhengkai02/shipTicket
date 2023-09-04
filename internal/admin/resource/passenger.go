@@ -50,6 +50,8 @@ func (p *Passenger) Fields(ctx *builder.Context) []interface{} {
 func (p *Passenger) Searches(ctx *builder.Context) []interface{} {
 	//options, _ := (&model.Line{}).TreeSelect(false)
 	users, _ := (&model.User{}).Options()
+	account, _ := (&model.Account{}).Options()
+	users = append(users, account...)
 	return []interface{}{
 		searches.Input("name", "用户名"),
 		searches.Select("user_id", "联系人", users),

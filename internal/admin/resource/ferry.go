@@ -19,14 +19,14 @@ import (
 	"time"
 )
 
-type Ship struct {
+type Ferry struct {
 	resource.Template
 }
 
 // 初始化
-func (p *Ship) Init(ctx *builder.Context) interface{} {
+func (p *Ferry) Init(ctx *builder.Context) interface{} {
 	// 标题
-	p.Title = "港口"
+	p.Title = "小客车及随行人员"
 	p.SubTitle = "子标题"
 	// 模型
 	p.Model = &model.Ship{}
@@ -41,7 +41,7 @@ func (p *Ship) Init(ctx *builder.Context) interface{} {
 //	return query.Debug().Where("status", "1")
 //}
 
-func (p *Ship) Fields(ctx *builder.Context) []interface{} {
+func (p *Ferry) Fields(ctx *builder.Context) []interface{} {
 	field := &resource.Field{}
 	return []interface{}{
 		field.ID("id", "ID"),
@@ -50,18 +50,19 @@ func (p *Ship) Fields(ctx *builder.Context) []interface{} {
 		field.Text("clxm", "型号"),
 		field.Text("sailDate", "日期"),
 		field.Text("sailTime", "时间"),
-		field.Datetime("startPortName", "出发港").SetDefault(1028),
-		field.Datetime("endPortName", "到达港").SetDefault(1017),
+		field.Text("startPortName", "出发港").SetDefault(1028),
+		field.Text("endPortName", "到达港").SetDefault(1017),
 
-		field.Datetime("className", "舱位"),
-		field.Datetime("embarkPortName", "码头"),
-		field.Datetime("pubCurrentCount", "旅客余票"),
-		field.Datetime("totalPrice", "价格").SetEditable(true),
+		field.Text("className", "车辆舱位"),
+		field.Number("pubCurrentCount", "余票"),
+		field.Text("passengerClassName", "旅客舱位"),
+		field.Number("pubCurrentCount", "旅客余票"),
+		field.Text("totalPrice", "价格").SetEditable(true),
 	}
 }
 
 // 搜索
-func (p *Ship) Searches(ctx *builder.Context) []interface{} {
+func (p *Ferry) Searches(ctx *builder.Context) []interface{} {
 	options, _ := (&model.Port{}).Options()
 	res := []interface{}{
 		searches.Select("startPortNo", "出发港", options),
@@ -90,7 +91,7 @@ func (p *Ship) Searches(ctx *builder.Context) []interface{} {
 }
 
 // 行为
-func (p *Ship) Actions(ctx *builder.Context) []interface{} {
+func (p *Ferry) Actions(ctx *builder.Context) []interface{} {
 	return []interface{}{
 		actions.CreateLink(),
 		actions.BatchDelete(),
@@ -107,7 +108,7 @@ func (p *Ship) Actions(ctx *builder.Context) []interface{} {
 }
 
 // 列表页渲染
-func (p *Ship) IndexRender(ctx *builder.Context) error {
+func (p *Ferry) IndexRender(ctx *builder.Context) error {
 	template := ctx.Template.(types.Resourcer)
 
 	// 获取数据
@@ -123,7 +124,7 @@ func (p *Ship) IndexRender(ctx *builder.Context) error {
 	return ctx.JSON(200, result)
 }
 
-func (p *Ship) shipList(ctx *builder.Context) interface{} {
+func (p *Ferry) shipList(ctx *builder.Context) interface{} {
 	var lists []map[string]interface{}
 
 	template := ctx.Template.(types.Resourcer)
@@ -185,7 +186,7 @@ func (p *Ship) shipList(ctx *builder.Context) interface{} {
 }
 
 // Get the column filters for the request.
-func (p *Ship) columnFilters(ctx *builder.Context) map[string]interface{} {
+func (p *Ferry) columnFilters(ctx *builder.Context) map[string]interface{} {
 	querys := ctx.AllQuerys()
 	var data map[string]interface{}
 	if querys["filter"] == nil {
@@ -200,7 +201,7 @@ func (p *Ship) columnFilters(ctx *builder.Context) map[string]interface{} {
 }
 
 // Get the orderings for the request.
-func (p *Ship) orderings(ctx *builder.Context) map[string]interface{} {
+func (p *Ferry) orderings(ctx *builder.Context) map[string]interface{} {
 	querys := ctx.AllQuerys()
 	var data map[string]interface{}
 	if querys["sorter"] == nil {
@@ -215,10 +216,10 @@ func (p *Ship) orderings(ctx *builder.Context) map[string]interface{} {
 }
 
 // 处理列表
-func (p *Ship) performsList(ctx *builder.Context, lists []map[string]interface{}) []interface{} {
+func (p *Ferry) performsList(ctx *builder.Context, lists []map[string]interface{}) []interface{} {
 	ticketReq := &admin.TicketReq{
 		StartPortNo: "1028",
-		EndPortNo:   "1017",
+		EndPortNo:   "1010",
 		StartDate:   time.Now().AddDate(0, 0, 1).Format(time.DateOnly),
 	}
 	ticketFilter := &admin.TicketFilter{}
@@ -238,7 +239,7 @@ func (p *Ship) performsList(ctx *builder.Context, lists []map[string]interface{}
 	}
 	reqBytes, _ := json.Marshal(ticketReq)
 	client := http.DefaultClient
-	req, err := http.NewRequest(http.MethodPost, admin.EnqURL, bytes.NewReader(reqBytes))
+	req, err := http.NewRequest(http.MethodPost, admin.FerryEnqURL, bytes.NewReader(reqBytes))
 	if err != nil {
 		return nil
 	}
@@ -274,7 +275,7 @@ func (p *Ship) performsList(ctx *builder.Context, lists []map[string]interface{}
 		if len(ticketFilter.Clxm) > 0 && v.Clxm != ticketFilter.Clxm {
 			continue
 		}
-		for _, cls := range v.SeatClasses {
+		for _, cls := range v.DriverSeatClass {
 			if len(ticketFilter.ClassName) > 0 && cls.ClassName != ticketFilter.ClassName {
 				continue
 			}
@@ -288,29 +289,20 @@ func (p *Ship) performsList(ctx *builder.Context, lists []map[string]interface{}
 			for k, v := range clsMap {
 				item[k] = v
 			}
+			if len(v.SeatClasses) > 0 {
+				for _, cls := range v.SeatClasses {
+					tmpItem := make(map[string]interface{})
+					for k, v := range item {
+						tmpItem[k] = v
+					}
+					tmpItem["passengerClassName"] = cls.ClassName
+					tmpItem["reseat"] = cls.PubCurrentCount
+					ret = append(ret, tmpItem)
+				}
+				continue
+			}
 			ret = append(ret, item)
 		}
 	}
 	return ret
-}
-
-func generateHeader() map[string]string {
-	header := map[string]string{
-		"Host":            `www.ssky123.com`,
-		"Sec-Fetch-Site":  `same-origin`,
-		"Accept-Language": `zh-CN,zh-Hans;q=0.9`,
-		"Accept-Encoding": `gunzip, deflate, br`,
-		"Sec-Fetch-Mode":  `cors`,
-		"Origin":          `https://www.ssky123.com`,
-		//"authentication":  `1684483703659965`,
-		"authentication": `1691741017659965`,
-		"User-Agent":     `Mozilla/5.0 (iPhone; CPU iPhone OS 16_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.31(0x18001f37) NetType/WIFI Language/zh_CN`,
-		"Referer":        `https://www.ssky123.com/online_booking/`,
-		"Content-Length": `0`,
-		"Connection":     `keep-alive`,
-		"Sec-Fetch-Dest": `empty`,
-		"Accept":         `application/json, text/plain, */*`,
-		"Content-Type":   "application/json",
-	}
-	return header
 }

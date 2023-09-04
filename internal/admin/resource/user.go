@@ -39,7 +39,7 @@ func (p *User) Fields(ctx *builder.Context) []interface{} {
 
 		//field.Editor("content", "内容").OnlyOnForms(),
 		field.Datetime("create_time", "创建时间").HideWhenCreating(true),
-		field.Datetime("update_time", "更新时间").HideWhenCreating(true),
+		field.Datetime("update_time", "更新时间"),
 	}
 }
 

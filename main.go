@@ -29,6 +29,7 @@ func main() {
 	// 加载工具服务
 	providers = append(providers, toolservice.Providers...)
 	// 数据库配置信息
+	//dsn := "root:Perr78!!@tcp(159.138.9.57:3306)/quarkgo?charset=utf8&parseTime=True&loc=Local"
 	dsn := "root:Perr78!!@tcp(localhost:3306)/quarkgo?charset=utf8&parseTime=True&loc=Local"
 
 	// 配置资源

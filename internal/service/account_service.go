@@ -83,8 +83,9 @@ func (s *AccountService) keepSession(account *model.Account) {
 			Name:       v.PassName,
 			IdCard:     v.CredentialNum,
 			CarNo:      "",
-			UserId:     v.Id,
+			UserId:     v.UserId,
 			CreateTime: time.Now(),
+			UpdateTime: time.Now(),
 		}
 		ps = append(ps, p)
 	}

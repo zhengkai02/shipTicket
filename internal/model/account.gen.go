@@ -5,6 +5,9 @@
 package model
 
 import (
+	"fmt"
+	"github.com/quarkcms/quark-go/v2/pkg/app/admin/component/form/fields/selectfield"
+	"github.com/quarkcms/quark-go/v2/pkg/dal/db"
 	"time"
 )
 
@@ -26,4 +29,22 @@ type Account struct {
 // TableName Account's table name
 func (*Account) TableName() string {
 	return TableNameAccount
+}
+
+// 获取列表
+func (p *Account) Options() (options []*selectfield.Option, Error error) {
+	getList := []Account{}
+	err := db.Client.Find(&getList).Error
+	if err != nil {
+		return options, err
+	}
+
+	for _, v := range getList {
+		option := &selectfield.Option{
+			Label: fmt.Sprintf("%v", v.Account),
+			Value: v.UserId,
+		}
+		options = append(options, option)
+	}
+	return options, nil
 }

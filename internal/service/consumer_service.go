@@ -63,12 +63,6 @@ func (s *ConsumerService) Stop(ctx context.Context) error {
 
 func (s *ConsumerService) process(t *model.Task) error {
 	log.Infof("处理任务：[%v-%v-%v %v-%v]", t.DeparturePortName, t.ArrivalPortName, t.DepartureDate.Format(time.DateOnly), t.EarliestTime, t.LastestTime)
-	// 查询航班
-	ticketList, err := api.ShipTicketList(t.DeparturePortCode, t.ArrivalPortCode, t.DepartureDate.Format(time.DateOnly))
-	if err != nil {
-		log.Errorf("航班查询失败，err=[%v]", err)
-		return err
-	}
 	switch true {
 	case t.VehicleNum > 0:
 		// 摆渡车
@@ -84,15 +78,33 @@ func (s *ConsumerService) process(t *model.Task) error {
 			if sailTime.Before(earliestTime) || sailTime.After(latestTime) {
 				continue
 			}
-			for _, cls := range ticket.DriverSeatClass {
-				if cls.PubCurrentCount >= t.VehicleNum {
-					msg := fmt.Sprintf("检测到摆渡车余票【%s-%s-%s %s %v ￥%v】【%v】张", ticket.StartPortName, ticket.EndPortName, ticket.SailDate, ticket.SailTime, cls.ClassName, cls.TotalPrice, cls.PubCurrentCount)
-					api.SendMsg("trip", msg)
-					log.Warnf(msg)
+			for _, dsc := range ticket.DriverSeatClass {
+				if dsc.PubCurrentCount >= t.VehicleNum {
+					if t.PassengerNum > 0 {
+						for _, cls := range ticket.SeatClasses {
+							if cls.PubCurrentCount >= t.PassengerNum {
+								msg := fmt.Sprintf("检测到摆渡车余票【%s-%s-%s %s %v ￥%v】【%v】张", ticket.StartPortName, ticket.EndPortName, ticket.SailDate, ticket.SailTime, cls.ClassName, cls.TotalPrice, cls.PubCurrentCount)
+								api.SendMsg("trip", msg)
+								log.Warnf(msg)
+								return nil
+							}
+						}
+					} else {
+						msg := fmt.Sprintf("检测到摆渡车余票【%s-%s-%s %s %v ￥%v】【%v】张", ticket.StartPortName, ticket.EndPortName, ticket.SailDate, ticket.SailTime, dsc.ClassName, dsc.TotalPrice, dsc.PubCurrentCount)
+						api.SendMsg("trip", msg)
+						log.Warnf(msg)
+					}
 				}
+
 			}
 		}
 	case t.VehicleNum == 0:
+		// 查询航班
+		ticketList, err := api.ShipTicketList(t.DeparturePortCode, t.ArrivalPortCode, t.DepartureDate.Format(time.DateOnly))
+		if err != nil {
+			log.Errorf("航班查询失败，err=[%v]", err)
+			return err
+		}
 		// 根据时间区间过滤航班
 		for _, ticket := range ticketList {
 			// 时间筛选

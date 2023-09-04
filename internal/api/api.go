@@ -155,11 +155,14 @@ func PassengerList(userId int64, token string) ([]*Passenger, error) {
 	req.Header.Set("token", token)
 	req.Header.Set("authentication", fmt.Sprintf("%v%v", time.Now().Unix(), userId))
 	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	defer res.Body.Close()
 	if err != nil {
 		return nil, err
 	}
-	resBytes, err := ioutil.ReadAll(res.Body)
+	resBytes, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}

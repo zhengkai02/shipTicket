@@ -7,6 +7,7 @@ var Provider = []interface{}{
 	&resource.Port{},
 	&resource.Line{},
 	&resource.Ship{},
+	&resource.Ferry{},
 	&resource.Order{},
 	&resource.Account{},
 	&resource.Task{},
