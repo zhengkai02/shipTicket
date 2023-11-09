@@ -9,14 +9,14 @@ import (
 )
 
 /**
-*@Auther kaikai.zheng
+*@Auther 
 *@Date 2023-05-05 16:42:05
 *@Name monitor
 *@Desc // 监控告警
 **/
 
 var (
-	SpiderManQG = "SpiderMan-QG"
+	SpiderManQG = "-"
 	DateLoyout1 = "2006-01-02 15:04:05"
 )
 
@@ -55,18 +55,18 @@ func SendMsg(facility, content string) error {
 		content = content[:1024]
 	}
 	var (
-		url             = "http://10.177.41.250:9999/alertnotify"
+		url             = ""
 		ApplicationJson = "application/json"
 		currTime        = time.Now().Format(DateLoyout1)
-		msgData         = fmt.Sprintf("[%s][%s][%s]\n%s", SpiderManQG, facility, currTime, content)
+		msgData         = fmt.Sprintf("[%s][%s][%s]\n%s", "", facility, currTime, content)
 	)
 	msg := &Msg{
 		Labels: &Labels{
 			Alertname: "airline",
 			Facility:  facility,
-			Job:       "QG",
+			Job:       "",
 			Level:     "P5",
-			Project:   "SpiderMan",
+			Project:   "",
 			Extra:     "测试",
 		},
 		Annotations: []*Annotation{
@@ -81,10 +81,10 @@ func SendMsg(facility, content string) error {
 		},
 		Users: []*User{
 			{
-				IdNo:  "1211367",
-				Name:  "郑凯凯",
-				Email: "kaikai.zheng@ly.com",
-				Memo:  "kaikai.zheng",
+				IdNo:  "",
+				Name:  "",
+				Email: "",
+				Memo:  "",
 			},
 		},
 	}
